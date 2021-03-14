@@ -25,7 +25,7 @@
       <small v-if="phError">{{ phError }}</small>
     </div>
 
-    <button class="btn" type="submit" :disabled="isSubmitting">Войти</button>
+    <button class="btn" type="submit" :disabled="isSubmitting">Зарегистрироваться</button>
     <p>Уже есть аккаунта! <router-link to="/login">Вход в систему</router-link></p>
   </form>
 </template>

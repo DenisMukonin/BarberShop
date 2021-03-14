@@ -10,10 +10,17 @@
       </span>
     </div>
     <div >
-      <p v-if="!isChange"><strong>Дата записи: </strong> {{ record.date }}</p>
+      <div v-if="!isChange">
+        <p><strong>Дата записи: </strong> {{ record.date }}</p>
+      </div>
       <span v-else>
         <label for="date"> Изменить дату записи: </label>
-        <input type="date" id="date" v-model="record.date" :min="today">
+        <input v-if="!isSelectDate" @click="isSelectDate = !isSelectDate" v-model="record.date"  type="date" id="date">
+        <div class="form-control" v-else>
+          <select-date v-model="dateRec" @close-date="isSelectDate = !isSelectDate" visible="true" ></select-date>
+          <h3>{{dateRec}}</h3>
+        </div>
+<!--        <input type="date" id="date" v-model="record.date" :min="today">-->
       </span>
     </div>
     <div>
@@ -53,10 +60,11 @@
 <script>
 import {useRoute, useRouter} from "vue-router";
 import {useStore} from "vuex";
-import {ref, computed, onMounted} from 'vue'
+import {ref, computed, watch, onMounted} from 'vue'
 import {todayFunction, changeStatus, choiceTime} from "@/use/my-function";
 import AppOptionSelect from "@/components/ui/AppOptionSelect";
 import AppOpt from "@/components/ui/AppOpt";
+import SelectDate from "@/components/date/SelectDate";
 
 export default {
   name: 'Client',
@@ -67,6 +75,8 @@ export default {
     const record = ref({})
     const isChange = ref(false)
     const today = ref(new Date())
+
+    const isSelectDate = ref(false)
 
     onMounted(async () => {
       record.value = await store.dispatch('record/loadOne', route.params.id)
@@ -79,13 +89,19 @@ export default {
 
     const myChoiceTime = () => {
       const arr = records.value.filter(recDate => {
-        return record.value.date === recDate.date//recDate.date.includes(Date.value)
+        return record.value.date === recDate.date
       })
 
       timeArray.value =  choiceTime(arr)
     }
 
 
+    const dateRec = ref(record.date)
+    watch(dateRec, value => {
+      let dt1 = value.split('.') //2014-04-03
+      let dt = dt1[2]+'-'+dt1[1]+'-' + dt1[0];
+      record.value.date = dt
+    })
 
     const remove = async () => {
       await store.dispatch('record/remove', {idClient: store.getters['record/idClient'], id:route.params.id})
@@ -106,10 +122,11 @@ export default {
       isChange,
       today,
       changeStatus,
-      timeArray, myChoiceTime
+      timeArray, myChoiceTime,
+      isSelectDate, dateRec
     }
   },
-  components: { AppOptionSelect, AppOpt }
+  components: { AppOptionSelect, AppOpt, SelectDate }
 }
 </script>
 

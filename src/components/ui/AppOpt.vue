@@ -6,13 +6,19 @@
 
 <script>
 import AppOptionSelect from "@/components/ui/AppOptionSelect";
-import {ref} from 'vue'
+import {ref, watch} from 'vue'
 
 export default {
-  emits: ['select'],
-  props:['time', 'date', 'timeArray'],
-  setup() {
+  emits: ['select', 'update:modelValue'],
+  props:['modelValue', 'time', 'date', 'timeArray'],
+  setup(_, {emit}) {
     const timeSelect = ref()
+
+    watch(timeSelect, value => {
+      emit('update:modelValue', value)
+      console.log('vsvs', value)
+    })
+
     return {
       timeSelect
     }

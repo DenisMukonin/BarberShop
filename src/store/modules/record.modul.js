@@ -80,6 +80,7 @@ export default {
             try {
                 const token = store.getters['login/token']
                 const { data } = await axios.post(`/clientsMPReviews.json?auth=${token}`, payload)
+
                 commit('addReviews', {...payload, id: data.name})
 
                 dispatch('setMessage', {
@@ -97,32 +98,38 @@ export default {
             try {
                 const token = store.getters['login/token']
                 const {data} = await axios.get(`/clientsMPReviews.json?auth=${token}`)
-                const reviews = Object.keys(data).map(key => (
-                    {...data[key], id: key})
-                )
 
-                commit('setReviews', reviews)
+                if (data) {
+                    const reviews = Object.keys(data).map(key => (
+                        {...data[key], id: key})
+                    )
+
+                    commit('setReviews', reviews)
+                }
             } catch (e) {
-                store.commit('login/logout')
                 dispatch('setMessage', {
                     value: error(e.response.data.error.message),
                     type: 'danger'
                 }, {root: true})
             }
         },
-        async load({ commit, dispatch }) {
+        async load({ commit, dispatch }) { // загрузить данные для таблицы
             try {
                 const token = store.getters['login/token']
                 const {data} = await axios.get(`/clientsMP.json?auth=${token}`)
-                const records = Object.keys(data).map(id => ({...data[id]}))
 
-                let rec = {}
-                for (let i of records) {
-                    rec = Object.assign(rec,i);
+                if (data) {
+                    const records = Object.keys(data).map(id => ({...data[id]})) //{ ...Object.keys(data[id]}), id: id}    //.map(key => (Object.keys(key).))
+
+                    let rec = {}
+                    for (let i of records) {
+                        rec = Object.assign(rec,i);
+                    }
+                    const recArr = Object.keys(rec).map(key => ({...rec[key], id: key}))
+
+                    commit('setRecords', recArr)
                 }
-                const recArr = Object.keys(rec).map(key => ({...rec[key], id: key}))
 
-                commit('setRecords', recArr)
             } catch (e) {
                 dispatch('setMessage', {
                     value: error(e.response.data.error.message),
@@ -134,13 +141,15 @@ export default {
             try {
                 const token = store.getters['login/token']
                 const {data} = await axios.get(`/clientsMP.json?auth=${token}`)
+                if (data) {
+                    commit('setIdClient', store.state.info.localIdClient)
 
-                commit('setIdClient', store.state.info.localIdClient)
+                    const data2 = Object.keys(data[store.getters['record/idClient']])
+                        .map(key => ({...data[store.getters['record/idClient']][key], id: key}) )
 
-                const data2 = Object.keys(data[store.getters['record/idClient']])
-                    .map(key => ({...data[store.getters['record/idClient']][key], id: key}) )
-
-                return data2
+                    return data2
+                }
+                return []
             } catch (e) {
                 dispatch('setMessage', {
                     value: error(e.response.data.error.message),
@@ -175,6 +184,7 @@ export default {
             try {
                 const token = store.getters['login/token']
                 const {data} = await axios.delete(`/clientsMP/${payload.idClient}/${payload.id}.json?auth=${token}`)
+
             } catch (e) {
                 dispatch('setMessage', {
                     value: error(e.response.data.error.message),
@@ -201,7 +211,7 @@ export default {
                 //не доработан. нет метода загрузки этих данных и чтения
                 const token = store.getters['login/token']
                 const { data } = await axios.post(`/clientsMPBlockDate.json?auth=${token}`, payload)
-                console.log('data', data)
+                // console.log('data', data)
                 dispatch('setMessage', {
                     value: 'Даты заблокированы',
                     type: 'primary'
@@ -213,6 +223,8 @@ export default {
                 }, {root: true})
             }
         }
+
+
 
     }
 }

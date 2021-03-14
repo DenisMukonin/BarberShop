@@ -12,7 +12,7 @@
       <li>
         <router-link to="/login">Войти</router-link>
       </li>
-      <li>
+      <li v-if="!auth">
         <router-link to="/register">Зарегистрироваться</router-link>
       </li>
       <li v-if="admin">
@@ -43,7 +43,7 @@ export default {
 
       const admin = ref(false)
       if (auth.value) {
-        admin.value = info.value.localIdClient === 'KWI4X2ZMUEQ47L45l1PyXr5Djut2'
+        admin.value = info.value.localIdClient === 'K0zzixVPjvXkt98rhr4DCkxxAqf2'
       }
 
       return {

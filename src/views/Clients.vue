@@ -20,6 +20,13 @@
         <label for="date">Выберите дату:</label>
         <input type="date" id="date" v-model="dateRecord">
       </div>
+      <div>
+        <div class="form-control card">
+          <select-date v-model="dateRec" ></select-date>
+          <h3>{{dateRec}}</h3>
+        </div>
+      </div>
+
       <record-table-date v-if="isDate" :records="records"></record-table-date>
     </div>
   </div>
@@ -31,6 +38,7 @@ import AppModel from "@/components/ui/AppModel";
 import RecordTable from "@/components/record/RecordTable";
 import RecordTableDate from "@/components/record/RecordTableDate";
 import BlockDate from "@/components/date/BlockDate";
+import SelectDate from "@/components/date/SelectDate";
 import {useStore} from 'vuex'
 import {ref, computed, watch, onMounted} from 'vue'
 
@@ -52,6 +60,14 @@ export default {
       } else {
         isDate.value = false
       }
+    })
+
+    const dateRec = ref(dateRecord.value)//computed(() => date.value)
+
+    watch(dateRec, value => {
+      let dt1 = value.split('.')
+      let dt = dt1[2]+'-'+dt1[1]+'-' + dt1[0];
+      dateRecord.value = dt
     })
 
     const records = computed(() => store.getters['record/records'] //recordsDate
@@ -87,12 +103,13 @@ export default {
         dateRecord.value = null
       },
       modal,
+      dateRec,
       block: () => {
 
       }
     }
   },
-  components: {RecordTableDate, AppModel , RecordTable, BlockDate}
+  components: {RecordTableDate, AppModel , RecordTable, BlockDate, SelectDate}
 }
 </script>
 

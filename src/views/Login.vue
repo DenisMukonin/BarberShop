@@ -46,7 +46,6 @@ export default {
 
 
     const onSubmit = handleSubmit(async values => {
-      console.log('FormLogin', values)
       try {
         await store.dispatch('login/login', values)
         router.push('/')

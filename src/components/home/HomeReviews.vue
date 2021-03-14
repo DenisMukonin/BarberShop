@@ -3,7 +3,6 @@
     <h1 class="content" style="color: #cccccc">Отзывы и пожелания</h1>
     <button class="btn warning" @click="changeReviews">{{ isReviews ? 'Закрыть отзывы' : 'Показать отзывы' }}</button>
     <div class="reviews-text" v-if="isReviews">
-
       <div class="reviews-message" >
         <h3>Отзывы:</h3>
         <div v-for="(rew,idx) in reviews" :key="idx">
@@ -41,7 +40,7 @@ export default {
     const isReviews = ref(false)
 
     function appraisalFunction(value) {
-      if (value === '-1') {
+      if (value === -1) {
         return 'Нет оценки'
       }
       return value

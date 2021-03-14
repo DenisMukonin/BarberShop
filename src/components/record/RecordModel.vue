@@ -8,19 +8,24 @@
 
     <div :class="['form-control form-control-small', {invalid: pError}]">
       <label for="phone">Телефон</label>
-      <input type="tel" id="phone" v-model="phone" @blur="pBlur">
+      <input type="tel" id="phone"  v-model="phone" @blur="pBlur">
       <small v-if="pError">{{ pError }}</small>
     </div>
 
     <div :class="['form-control form-control-small', {invalid: dError}]" @blur="dBlur" >
       <label for="date">Дата</label>
-      <input type="date" id="date" v-model="date" :min="today">
+      <input v-if="isSelectDate"  @click="isSelectDate = !isSelectDate" v-model="date" type="date" id="date">
+      <div v-else>
+        <select-date v-model="dateRec" @close-date="myChoiceTime" visible="true"></select-date>
+        <h3>Выбранная дата: {{dateRec}}</h3>
+      </div>
       <small v-if="dError">{{ dError }}</small>
     </div>
 
     <div :class="['form-control form-control-small', {invalid: tError}]" @blur="tBlur" >
       <label for="time">Время</label>
-      <AppOpt id="time" v-model="time" :key="date" :date="date" :time="time" :time-array="timeArray" @select="myChoiceTime"></AppOpt>
+      <AppOpt id="time" v-model="time" :key="date" :date="date" :time="time" :time-array="timeArray">
+      </AppOpt>
       <small v-if="tError">{{ tError }}</small>
     </div>
 
@@ -44,20 +49,21 @@
 import {useStore} from "vuex";
 import {useField, useForm} from "vee-validate";
 import * as yup from 'yup'
-import {ref,onMounted, computed} from 'vue'
+import {ref,onMounted, computed, watch} from 'vue'
 import {todayFunction,choiceTime} from "@/use/my-function";
 import AppOptionSelect from "@/components/ui/AppOptionSelect";
 import AppOpt from "@/components/ui/AppOpt";
+import SelectDate from "@/components/date/SelectDate";
 
 export default {
   emits: ['record'],
   setup(_, {emit}) {
     const store = useStore()
-    const today = ref(new Date())
     const dateRecord = ref(null)
+    const isSelectDate = ref(false)
 
     onMounted(async () => {
-      today.value = todayFunction()
+      date.value = todayFunction()
       myChoiceTime()
     })
 
@@ -70,11 +76,20 @@ export default {
         return date.value === recDate.date
       })
       timeArray.value = choiceTime(arr)
+      isSelectDate.value = !isSelectDate.value
     }
+
+    const dateRec = ref(date)
+    watch(dateRec, value => {
+      let dt1 = value.split('.')
+      let dt = dt1[2]+'-'+dt1[1]+'-' + dt1[0];
+      date.value = dt
+    })
 
     const {handleSubmit, isSubmitting} = useForm({
       initialValues: {
-        status: 'haircut'
+        status: 'haircut',
+        date: new Date().toLocaleDateString()
       }
     })
 
@@ -123,11 +138,11 @@ export default {
       date, dError, dBlur,
       status,
       onSubmit, isSubmitting,
-      today,
-      timeArray, myChoiceTime
+      timeArray, myChoiceTime,
+      isSelectDate, dateRec
     }
   },
-  components: { AppOptionSelect, AppOpt }
+  components: { AppOptionSelect, AppOpt, SelectDate }
 }
 </script>
 

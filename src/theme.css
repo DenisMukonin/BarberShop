@@ -131,6 +131,12 @@ form {
     margin-bottom: 0.5rem;
 }
 
+input[type="date"] {
+    min-height: 1px;
+    display: block;
+    text-align: right;
+}
+
 .form-control input,
 .form-control select,
 .form-control textarea{
@@ -270,8 +276,9 @@ form {
 }
 
 .modal {
-    position: fixed;
-    top: 65px;
+    position: absolute;
+/*//fixed*/
+    top: 650px;
     width: 600px;
     padding: 1rem;
     background: rgba(0, 0, 0, 0.8);
@@ -724,6 +731,48 @@ form {
 }
 
 
+.date-select {
+    border: grey solid 2px ;
+    background: black;
+    color: white;
+    align-items: center;
+    justify-content: center;
+    margin-top: 5px;
+}
+
+.date-flex {
+    display: inline-flex;
+}
+
+.date-year, .date-mouth  {
+    display: flex;
+    background: white;
+    color: black;
+    align-items: center;
+    justify-content: center;
+    margin: 5px;
+    padding: 0;
+    max-height: 40px;
+}
+
+.date-mouth .left, .date-year .left{
+    position: absolute;
+    left: 20px;
+}
+.date-mouth .right, .date-year .right{
+    position: absolute;
+    right: 20px;
+}
+
+
+.date-day {
+    margin: 5px;
+}
+
+
+input#date {
+    min-height: 1px;
+}
 
 @media only screen and (max-width: 800px) {
     .navbar-small {
@@ -761,6 +810,12 @@ form {
     .form-control-small {
         position: relative;
         margin-bottom: 0.5rem;
+    }
+
+    input[type="date"] {
+        min-height: 1px;
+        display: block;
+        text-align: right;
     }
 
     .form-control-small input,
