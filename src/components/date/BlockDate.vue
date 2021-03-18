@@ -17,15 +17,14 @@
 
   <button class="btn warning" @click="submit">Заблокировать запись на эти даты</button>
   <div>
-    <h2>mouth - {{mouth}}</h2>
-    <h2>day - {{day}}</h2>
+    <h2>Меcяц - {{mouthMap[mouth-1].name}}</h2>
+    <h2>День/дни - {{day}}</h2>
   </div>
 </template>
 
 <script>
 import {ref, watch} from 'vue'
 import {useStore} from 'vuex'
-import store from "@/store";
 import {error} from "@/utils/error";
 
 export default {

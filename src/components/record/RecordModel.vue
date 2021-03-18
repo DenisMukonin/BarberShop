@@ -50,7 +50,7 @@ import {useStore} from "vuex";
 import {useField, useForm} from "vee-validate";
 import * as yup from 'yup'
 import {ref,onMounted, computed, watch} from 'vue'
-import {todayFunction,choiceTime} from "@/use/my-function";
+import {todayFunction, choiceTime, myValidateDate} from "@/use/my-function";
 import AppOptionSelect from "@/components/ui/AppOptionSelect";
 import AppOpt from "@/components/ui/AppOpt";
 import SelectDate from "@/components/date/SelectDate";
@@ -84,6 +84,11 @@ export default {
       let dt1 = value.split('.')
       let dt = dt1[2]+'-'+dt1[1]+'-' + dt1[0];
       date.value = dt
+
+      const isD = myValidateDate(date.value)
+      if (!isD) {
+        date.value = null
+      }
     })
 
     const {handleSubmit, isSubmitting} = useForm({
@@ -94,12 +99,12 @@ export default {
     })
 
     const {value: fio, errorMessage: fError, handleBlur: fBlur} = useField(
-        'fio', // название контрола,
-        yup.string().trim().required('Введите ФИО') //.name() // набор валидаторов
+        'fio',
+        yup.string().required('Введите ФИО')
     )
 
     const {value: phone, errorMessage: pError, handleBlur: pBlur} = useField(
-        'phone', // название контрола,
+        'phone',
         yup.string()
             .trim()
             // .typeError('Это не похоже на номер телефона')
@@ -111,7 +116,9 @@ export default {
 
     const {value: date, errorMessage: dError, handleBlur: dBlur} = useField(
         'date',
-        yup.string().required('Введите дату')
+        yup.string()
+        .nullable()
+        .required('Введите дату или была Введена дата в прошлое')
     )
 
     const {value: time, errorMessage: tError, handleBlur: tBlur} = useField(

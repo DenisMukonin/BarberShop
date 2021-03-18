@@ -26,7 +26,6 @@ export default {
             localStorage.setItem(TOKEN_KEY, token)
         },
         logout(state){
-            console.log('logout!')
             state.token = null
             localStorage.removeItem(TOKEN_KEY)
             localStorage.removeItem(INFO_KEY)

@@ -1,10 +1,10 @@
 <template>
-  <option :disabled="test.includes(value)" :value="value">{{ value }}</option>
+  <option :disabled="block.includes(value)" :value="value">{{ value }}</option>
 </template>
 
 <script>
 export default {
-  props: ['value','test'],
+  props: ['value','block'],
   setup() {
     return {
 

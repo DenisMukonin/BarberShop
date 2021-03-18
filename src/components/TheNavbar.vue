@@ -7,7 +7,7 @@
 
     <ul class="navbar-menu navbar-menu-small">
       <li>
-        <router-link to="/">Home</router-link>
+        <router-link to="/">Главная</router-link>
       </li>
       <li>
         <router-link to="/login">Войти</router-link>

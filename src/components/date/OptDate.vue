@@ -1,7 +1,6 @@
 <template>
   <select v-model="day" >
-    <opt-date-select v-for="d in map" :key="d" :value="d" :test="test"></opt-date-select>
-<!--    <option v-for="d in dayMap" :value="d">{{ d }}</option>-->
+    <opt-date-select v-for="d in map" :key="d" :value="d" :block="block"></opt-date-select>
   </select>
 </template>
 
@@ -11,10 +10,16 @@ import OptDateSelect from "@/components/date/OptDateSelect";
 
 export default {
   emits: ['update:modelValue'],
-  props: ['modelValue', 'map', 'test'],
+  props: ['modelValue', 'map', 'block'],
   setup(props, {emit}) {
 
-    const day = ref(1)
+    // let i = 1
+    // while (props.block.includes(i.toString())) {
+    //   i++
+    // }
+    // const day = ref(i)
+
+    const day = ref(props.modelValue)
     watch(day, value => {
       emit('update:modelValue', value)
     })

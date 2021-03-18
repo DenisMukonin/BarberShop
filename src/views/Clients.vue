@@ -4,7 +4,7 @@
       <button class="btn" @click="changeTable" :disabled="!isTable">Список клиентов</button>
       <button class="btn" @click="changeTable" :disabled="isTable">Записи на стрижку</button>
     </p>
-    <button class="btn warning" @click="modal = !modal" disabled="false">Заблокировать даты на стрижки</button>
+    <button class="btn warning" @click="modal = !modal">Заблокировать даты на стрижки</button>
     <teleport to="body">
       <app-model title="Заблокировать даты" v-if="modal" @close="modal = false">
         <block-date></block-date>
@@ -41,17 +41,38 @@ import BlockDate from "@/components/date/BlockDate";
 import SelectDate from "@/components/date/SelectDate";
 import {useStore} from 'vuex'
 import {ref, computed, watch, onMounted} from 'vue'
+import {useRouter} from "vue-router";
 
 export default {
   setup() {
     const store = useStore()
+    const router = useRouter()
     const isTable = ref(false)
     const isDate = ref(false)
-    const dateRecord = ref(null)
+    const dateRecord = ref()
+
+    // НЕ работает
+    // if (!isTable.value) {
+    //   function month () {
+    //     if ((new Date().getMonth()+1).toString().length === 1) {
+    //       return ('0' + (new Date().getMonth()+1).toString())
+    //     }
+    //     return (new Date().getMonth()+1).toString()
+    //   }
+    //
+    //   dateRecord.value = new Date().getFullYear() + '-'+ month()  + '-' + new Date().getDate()
+    // }
+
     const modal = ref(false)
+    const auth = computed(() => store.getters['login/isAuthenticated'])
 
     onMounted(async () => {
-      await store.dispatch('record/load')
+      if (auth.value) {
+        await store.dispatch('record/load')
+      } else {
+        store.commit('login/logout')
+        router.push('/')
+      }
     })
 
     watch(dateRecord, values => {
@@ -62,7 +83,7 @@ export default {
       }
     })
 
-    const dateRec = ref(dateRecord.value)//computed(() => date.value)
+    const dateRec = ref(dateRecord.value)
 
     watch(dateRec, value => {
       let dt1 = value.split('.')
@@ -70,10 +91,10 @@ export default {
       dateRecord.value = dt
     })
 
-    const records = computed(() => store.getters['record/records'] //recordsDate
+    const records = computed(() => store.getters['record/records']
             .filter(recDate => {
               if (dateRecord.value) {
-                return dateRecord.value === recDate.date//recDate.date.includes(Date.value)
+                return dateRecord.value === recDate.date
               }
               return recDate
             })

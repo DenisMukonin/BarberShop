@@ -1,5 +1,6 @@
 import axios from "axios";
 import router from '../router'
+import store from '../store'
 
 const requestAxios = axios.create({
     baseURL: process.env.VUE_APP_FB_URL//https://barbershopsmaksp001.firebaseio.com
@@ -7,7 +8,9 @@ const requestAxios = axios.create({
 
 requestAxios.interceptors.response.use(null, error => {
     if (error.response.status === 401) {
-        router.push('/login/?message=auth')
+        console.log('error.response.status', error.response.status)
+        store.commit('login/logout')
+        router.push('/')
     }
 
     return Promise.reject(error);

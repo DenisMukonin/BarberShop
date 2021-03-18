@@ -16,7 +16,6 @@ export default {
 
     watch(timeSelect, value => {
       emit('update:modelValue', value)
-      console.log('vsvs', value)
     })
 
     return {

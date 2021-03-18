@@ -13,7 +13,7 @@
         <h4>Для доступа к полному функционалу войдите в систему или зарегестрируйтесь
           <span @click="closeInfo">&times;</span>
         </h4>
-        <p><router-link to="/login">Войти  </router-link> / <router-link to="/register">Зарегестрироваться</router-link></p>
+        <p><router-link to="/login">Войти</router-link> / <router-link to="/register">Зарегистрироваться</router-link></p>
       </div>
     </div>
 

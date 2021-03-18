@@ -15,16 +15,24 @@
 <script>
 import RecordTableInfo from '@/components/record/RecordTableInfo';
 import {useStore} from 'vuex';
-import {ref, onMounted} from 'vue'
+import {useRouter} from 'vue-router'
+import {ref, onMounted, computed} from 'vue'
 
 export default {
   setup() {
     const store = useStore()
+    const router = useRouter()
     const records = ref({})
     const info = ref(null)
+    const auth = computed(() => store.getters['login/isAuthenticated'])
 
     onMounted(async () => {
-      records.value = await store.dispatch('record/loadOneClient')
+      if (auth.value) {
+        records.value = await store.dispatch('record/loadOneClient')
+      } else {
+        store.commit('login/logout')
+        router.push('/')
+      }
     })
 
     info.value = store.state.info

@@ -47,6 +47,11 @@ export default {
                     const token = store.getters['login/token']
                     const { data } = await axios.post(`/clientsMP/${idClient}.json?auth=${token}`, payload)
                     commit('addRecords', {...payload, id: data.name})
+
+                    dispatch('setMessage', {
+                        value: 'Запись создана! Редактирование и просмотр записей возможен в Профиле',
+                        type: 'primary'
+                    }, {root: true})
                 } else {
                     dispatch('setMessage', {
                         value: 'Для записи вам нужно зарегестрироваться',
@@ -141,13 +146,15 @@ export default {
             try {
                 const token = store.getters['login/token']
                 const {data} = await axios.get(`/clientsMP.json?auth=${token}`)
+
                 if (data) {
                     commit('setIdClient', store.state.info.localIdClient)
-
-                    const data2 = Object.keys(data[store.getters['record/idClient']])
-                        .map(key => ({...data[store.getters['record/idClient']][key], id: key}) )
-
-                    return data2
+                    if (data[store.getters['record/idClient']]) {
+                        const data2 = Object.keys(data[store.getters['record/idClient']])
+                            .map(key => ({...data[store.getters['record/idClient']][key], id: key}) )
+                        return data2
+                    }
+                    return []
                 }
                 return []
             } catch (e) {
@@ -185,6 +192,10 @@ export default {
                 const token = store.getters['login/token']
                 const {data} = await axios.delete(`/clientsMP/${payload.idClient}/${payload.id}.json?auth=${token}`)
 
+                dispatch('setMessage', {
+                    value: 'Запись была удалена',
+                    type: 'warning'
+                }, {root: true})
             } catch (e) {
                 dispatch('setMessage', {
                     value: error(e.response.data.error.message),
@@ -198,6 +209,11 @@ export default {
                 const record = {fio:payload.fio, phone:payload.phone, date:payload.date,time:payload.time, status:payload.status}
                 const token = store.getters['login/token']
                 const {data} = await axios.put(`/clientsMP/${payload.idClient}/${payload.id}.json?auth=${token}`, record)
+
+                dispatch('setMessage', {
+                    value: 'Произошло обновление данных',
+                    type: 'primary'
+                }, {root: true})
             } catch (e) {
                 dispatch('setMessage', {
                     value: error(e.response.data.error.message),
@@ -205,10 +221,8 @@ export default {
                 }, {root: true})
             }
         },
-
         async createDateBlock({commit, dispatch}, payload) {
             try {
-                //не доработан. нет метода загрузки этих данных и чтения
                 const token = store.getters['login/token']
                 const { data } = await axios.post(`/clientsMPBlockDate.json?auth=${token}`, payload)
                 // console.log('data', data)
@@ -221,6 +235,19 @@ export default {
                     value: error(e.response.data.error.message),
                     type: 'danger'
                 }, {root: true})
+            }
+        },
+        async loadDateBlock({ dispatch }) {
+            try {
+                const token = store.getters['login/token']
+                const {data} = await axios.get(`/clientsMPBlockDate.json?auth=${token}`)
+                return data ? Object.keys(data).map(key => data[key]) : []
+            } catch (e) {
+                console.log(e.response.data.error.message)
+                // dispatch('setMessage', {
+                //     value: error(e.response.data.error.message),
+                //     type: 'danger'
+                // }, {root: true})
             }
         }
 

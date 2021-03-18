@@ -1,5 +1,5 @@
 <template>
-  <h4 v-if="records.length === 0" class="text-center">Заявок пока нет</h4>
+  <h4 v-if="records.length === 0" class="text-center">Записей пока нет</h4>
   <table class="table">
     <thead>
     <tr>
@@ -16,7 +16,6 @@
       <td>{{ r.fio }}</td>
       <td>{{ r.phone }}</td>
       <td>{{ new Date(r.date).toLocaleDateString() }}</td>
-<!--      <td>{{ r.date.toString() }}</td>-->
       <td>
         <router-link v-slot="{navigate}" :to="{name: 'Client', params: {id: r.id}}">
           <button class="btn" @click="navigate">Открыть</button>

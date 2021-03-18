@@ -1,5 +1,5 @@
 <template>
-  <h4 v-if="records.length === 0" class="text-center">Заявок пока нет</h4>
+  <h4 v-if="records.length === 0" class="text-center">Записей пока нет</h4>
   <table class="table">
     <thead>
     <tr>

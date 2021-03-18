@@ -11,7 +11,7 @@
     </div>
     <div >
       <div v-if="!isChange">
-        <p><strong>Дата записи: </strong> {{ record.date }}</p>
+        <p><strong>Дата записи: </strong> {{ new Date(record.date).toLocaleDateString()  }}</p>
       </div>
       <span v-else>
         <label for="date"> Изменить дату записи: </label>
@@ -20,7 +20,6 @@
           <select-date v-model="dateRec" @close-date="isSelectDate = !isSelectDate" visible="true" ></select-date>
           <h3>{{dateRec}}</h3>
         </div>
-<!--        <input type="date" id="date" v-model="record.date" :min="today">-->
       </span>
     </div>
     <div>
@@ -61,7 +60,7 @@
 import {useRoute, useRouter} from "vue-router";
 import {useStore} from "vuex";
 import {ref, computed, watch, onMounted} from 'vue'
-import {todayFunction, changeStatus, choiceTime} from "@/use/my-function";
+import {todayFunction, changeStatus, choiceTime, myValidateDate} from "@/use/my-function";
 import AppOptionSelect from "@/components/ui/AppOptionSelect";
 import AppOpt from "@/components/ui/AppOpt";
 import SelectDate from "@/components/date/SelectDate";
@@ -73,15 +72,23 @@ export default {
     const router = useRouter()
     const store = useStore()
     const record = ref({})
+    const info = computed(() => store.state.info || null)
     const isChange = ref(false)
     const today = ref(new Date())
 
     const isSelectDate = ref(false)
+    const auth = computed(() => store.getters['login/isAuthenticated'])
 
     onMounted(async () => {
-      record.value = await store.dispatch('record/loadOne', route.params.id)
-      today.value = todayFunction()
-      myChoiceTime()
+      if (auth.value) {
+        record.value = await store.dispatch('record/loadOne', route.params.id)
+        today.value = todayFunction()
+        myChoiceTime()
+      } else {
+        store.commit('login/logout')
+        router.push('/')
+      }
+
     })
 
     const records = computed(() => store.getters['record/records'])
@@ -101,15 +108,31 @@ export default {
       let dt1 = value.split('.') //2014-04-03
       let dt = dt1[2]+'-'+dt1[1]+'-' + dt1[0];
       record.value.date = dt
+
+      const isD = myValidateDate(record.value.date)
+      if (!isD) {
+        record.value.date = null
+      }
     })
 
     const remove = async () => {
       await store.dispatch('record/remove', {idClient: store.getters['record/idClient'], id:route.params.id})
-      router.push('/clients')
+      router.back()// router.go(-1)
     }
 
     const update = async () => {
-      await store.dispatch('record/update', {...record.value})
+      if ( record.value.phone != '' &&
+          record.value.date != null &&
+          record.value.time != null) {
+        await store.dispatch('record/update', {...record.value})
+      } else {
+        await store.dispatch('setMessage', {
+          value: 'Ошибка обновления: не все данные введены корректно',
+          type: 'danger'
+        }, {root: true})
+        setTimeout(() => {location.reload()}, 2000)
+      }
+
       isChange.value = !isChange.value
     }
 

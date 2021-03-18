@@ -18,38 +18,46 @@
 
     <div class="date-day">
       <label for="day">Выберите день:</label>
-<!--      <div>-->
-<!--        <select id="day" v-model="day">-->
-<!--          <option v-for="d in dayMap" :value="d">{{ d }}</option>-->
-<!--        </select>-->
-<!--      </div>-->
       <div id="day">
-        <opt-date v-model="day" :map="dayMap" :test="test"></opt-date>
+        <opt-date v-model="day" :map="dayMap" :block="blockDays"></opt-date>
       </div>
     </div>
 
-<!--    {{date}}-->
     <button class="btn warning" v-if="visible" @click="$emit('close-date')">Готово</button>
   </div>
 </template>
 
 <script>
-import {ref, computed, watch} from 'vue'
+import {ref, onMounted, watch} from 'vue'
 import OptDate from "@/components/date/OptDate";
+import {useStore} from "vuex";
+import {blockDay} from "@/use/my-function";
 
 export default {
   emits: ['update:modelValue', 'close-date'],
   props: ['modelValue', 'visible'],
   setup(props, {emit}) {
+
     const year = ref(new Date().getFullYear())
     const mouth = ref(new Date().getMonth())
     const day = ref(new Date().getDate())
 
-    const test = ref([])
+    const blockDays = ref([])
+    let blockDayRecord = null
     let i = 1
-    while ( i < new Date().getDate()) {
-      test.value.push(i++);
-    }
+    const store = useStore()
+
+    onMounted( async () => {
+      blockDayRecord = await store.dispatch('record/loadDateBlock')
+
+      while ( i < new Date().getDate()) {
+        blockDays.value.push(i++);
+      }
+
+      const test = new Date(year.value, mouth.value, day.value).toLocaleDateString()
+      blockDays.value = blockDay(blockDayRecord, blockDays, test)
+
+    })
 
     const dayMap = ref(33 - new Date(new Date().getFullYear(), new Date().getMonth(), 33).getDate())
     const mouthMap = [
@@ -78,40 +86,39 @@ export default {
         dayMap.value = 30
       } else dayMap.value = 31
 
-      day.value = 1
     })
 
     watch([year,mouth, day], value => {
-      console.log(value)
-      test.value = []
+      blockDays.value = []
+
       if (value[0] <= new Date().getFullYear() &&
-          value[1] < new Date().getMonth() &&
-          value[2] < new Date().getDate()) {
-        console.log('меньше!')
+          value[1] < new Date().getMonth()
+      ) {
         i = 1
         while ( i <= dayMap.value) {
-          test.value.push(i++);
+          blockDays.value.push(i++);
         }
+
       } else
         if (value[0] === new Date().getFullYear() &&
             value[1] === new Date().getMonth() ) {
-          console.log('равен!')
           i = 1
           while ( i < new Date().getDate()) {
-            test.value.push(i++);
+            blockDays.value.push(i++);
           }
+
         }
-        // else {
-        //   console.log('пуст!')
-        //   test.value = []
-        // }
+
+      const test = new Date(year.value, mouth.value, day.value).toLocaleDateString()
+      blockDays.value = blockDay(blockDayRecord, blockDays, test)
+
       emit('update:modelValue', new Date(value[0], value[1], value[2]).toLocaleDateString())
     })
 
     return {
       day, mouth, year,
       mouthMap, dayMap,
-      test
+      blockDays
     }
   },
   components: { OptDate }

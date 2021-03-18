@@ -79,3 +79,34 @@ export function choiceTime(records) {
 
     return timeArray
 }
+
+
+export function blockDay(blockDayRecord, blockDays, test) {
+    blockDayRecord.forEach(key => {
+        key.toString().split(',').forEach(elem => {
+            if (elem.toString().split('.')[1] === test.split('.')[1]
+                && elem.toString().split('.')[2] === test.split('.')[2]) {
+                blockDays.value.push(+elem.toString().split('.')[0]);
+            }
+        })
+    })
+    return blockDays.value
+}
+
+export function myValidateDate(value)
+{
+    const arrD = value.split("-");
+    arrD[1] -= 1;
+    const d = new Date(arrD[0], arrD[1], arrD[2]);
+    const dm = new Date()
+    if ((d.getFullYear() == arrD[0]) && (d.getMonth() == arrD[1]) && (d.getDate() == arrD[2])) {
+        if ( ((d.getFullYear() < dm.getFullYear())) ||
+            ((d.getFullYear() == dm.getFullYear()) && (d.getMonth() < dm.getMonth())) ||
+            ((d.getFullYear() == dm.getFullYear()) && (d.getMonth() == dm.getMonth()) && (d.getDate() < dm.getDate()))
+        ) {
+            return false
+        }
+        return true
+    }
+    return false
+}
